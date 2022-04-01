@@ -1,43 +1,40 @@
 {
-  description = "my_description";
-
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, ... }@inputs:
+    inputs.flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import inputs.nixpkgs { inherit system; };
 
-        rEnv = pkgs.rWrapper.override {
-          packages = with pkgs.rPackages; [
-            Rcpp
-          ];
-        };
+        haskellPackages = pkgs.haskellPackages;
 
-        buildR = { stdenv, ... }: pkgs.rPackages.buildRPackage {
-          name = "my_title";
-          src = ./.;
-          nativeBuildInputs = [ rEnv ];
-        };
+        packageName = "hanao";
 
-        packageName = "my_title";
-      in
-      {
-        packages.${packageName} = buildR pkgs;
+        project = returnShellEnv:
+          haskellPackages.developPackage {
+            inherit returnShellEnv;
+            root = ./.;
+            name = packageName;
+            modifier = drv:
+                pkgs.haskell.lib.addBuildTools drv
+                  (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
+                    # Specify your build/dev dependencies here.
+                    cabal-fmt
+                    cabal-install
+                    ghcid
+                    haskell-language-server
+                    ormolu
+                    pkgs.nixpkgs-fmt
+                  ]);
+          };
+      in {
+        packages.${packageName} = project false;
 
         defaultPackage = self.packages.${system}.${packageName};
 
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            # R
-            rEnv
-
-            # c++
-            llvmPackages_latest.clang
-          ];
-        };
+        devShell = project true;
       });
 }
