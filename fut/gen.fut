@@ -5,6 +5,9 @@ module dist = uniform_real_distribution f32 minstd_rand
 
 module shuf = mk_shuffle minstd_rand
 
+def fst (x, _) = x
+def snd (_, y) = y
+
 def gen_tuple rng =
   let (rng, x) = dist.rand (0, 1) rng
   let (rng, y) = dist.rand (0, 1) rng
@@ -28,3 +31,15 @@ def path_length [n] (xs : [n][2]f32) =
   in f32.sum pairs
 
 def permutation rng x = shuf.shuffle rng x
+
+def pick_tuple check (s1, v1) (s2, v2) =
+  if check s1 s2 then
+    (s1, v1)
+  else
+    (s2, v2)
+
+def max_by_key [n] 'a 'b (k: a -> b) (gt: b -> b -> bool) (xs: [n]a): a =
+  let xs = zip (map k xs) xs
+  in xs
+    |> reduce (pick_tuple gt)
+    |> snd
