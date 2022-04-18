@@ -1,7 +1,11 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, ... }@inputs:
@@ -11,7 +15,7 @@
 
         haskellPackages = pkgs.haskellPackages;
 
-        rootDir = builtins.path { path = ./.; name = "nao";};
+        rootDir = builtins.path { path = ./.; name = "nao"; };
         haskellName = "hanao";
         pythonName = "pynao";
         futharkName = "futnao";
@@ -19,7 +23,7 @@
         pynaoProject = {
           projectDir = rootDir;
           overrides = pkgs.poetry2nix.overrides.withDefaults (
-            self: super: {}
+            self: super: { }
           );
         };
 
