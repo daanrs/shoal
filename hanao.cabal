@@ -9,6 +9,6 @@ library
       , base
       , futhark
 
-    hs-source-dirs: src
+    hs-source-dirs: hs
     exposed-modules: Hanao
     default-language: Haskell2010

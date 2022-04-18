@@ -11,7 +11,7 @@
 
         haskellPackages = pkgs.haskellPackages;
 
-        rootDir = builtins.path { path = ./.; name = "hanao";};
+        rootDir = builtins.path { path = ./.; name = "nao";};
         haskellName = "hanao";
         pythonName = "pynao";
         futharkName = "futnao";
@@ -29,7 +29,7 @@
         hanao = returnShellEnv:
           haskellPackages.developPackage {
             inherit returnShellEnv;
-            root = builtins.path { path = ./.; name = haskellName; };
+            root = rootDir;
             name = haskellName;
             modifier = drv:
               pkgs.haskell.lib.addBuildTools drv

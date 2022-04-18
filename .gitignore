@@ -1,3 +1,6 @@
+# generated futhark code
+py/fut
+
 # Nix
 .direnv
 

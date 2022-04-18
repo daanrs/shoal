@@ -11,7 +11,7 @@ def gen_tuple rng =
   let (rng, y) = dist.rand (0, 1) rng
   in (rng, [x, y])
 
-def tsp_generate n =
+entry tsp_generate n =
   let rng = minstd_rand.rng_from_seed [123]
   let rngs = minstd_rand.split_rng n rng
   let (rngs, xs) = unzip (map gen_tuple rngs)
