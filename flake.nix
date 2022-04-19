@@ -14,6 +14,8 @@
         pkgs = import inputs.nixpkgs { inherit system; };
 
         haskellPackages = pkgs.haskellPackages;
+        pythonPackages = pkgs.python39Packages;
+        poetry2nix = pkgs.poetry2nix;
 
         rootDir = builtins.path { path = ./.; name = "nao"; };
         haskellName = "hanao";
@@ -28,7 +30,15 @@
         };
 
         pynao = pkgs.poetry2nix.mkPoetryApplication pynaoProject;
-        pynaoEnv = pkgs.poetry2nix.mkPoetryEnv pynaoProject;
+        pynaoEnv = (pkgs.poetry2nix.mkPoetryEnv pynaoProject).env.overrideAttrs (
+          old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              pythonPackages.ipython
+              # pythonPackages.poetry
+              pkgs.poetry
+            ];
+          }
+        );
 
         hanao = returnShellEnv:
           haskellPackages.developPackage {
@@ -53,8 +63,7 @@
         defaultPackage = self.packages.${system}.${haskellName};
 
         devShell = pkgs.mkShell {
-          inputsFrom = [ pynaoEnv.env hanaoEnv ];
-          buildInputs = [ pkgs.python39Packages.ipython ];
+          inputsFrom = [ pynaoEnv hanaoEnv ];
         };
       }
     );
