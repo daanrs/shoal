@@ -11,7 +11,7 @@ def gen_tuple rng =
   let (rng, y) = dist.rand (0, 1) rng
   in (rng, [x, y])
 
-entry tsp_generate n s =
+entry tsp_generate (n: i64) (s: i32) =
   let rng = minstd_rand.rng_from_seed [s]
   let rngs = minstd_rand.split_rng n rng
   let (rngs, xs) = unzip (map gen_tuple rngs)
@@ -25,18 +25,18 @@ def path_length [n] 't (xs : [n][2]f32) =
   let pairs = map2 distance xs ys
   in f32.sum pairs
 
-def random_individual problem rng =
-  shuf.shuffle problem rng
+def random_individual rng problem =
+  shuf.shuffle rng problem
 
-entry initial_pop n problem rng =
-  let rngs = minstd_rand.rng_split_rng n rng
-  let (rngs, pop) = map (random_individual problem) rng
+entry initial_pop (n: i64) (problem: [][2]f32) rng =
+  let rngs = minstd_rand.split_rng n rng
+  let (rngs, pop) = unzip (map (flip random_individual problem) rngs)
   in (minstd_rand.join_rng rngs, pop)
 
 def generate_change rng path =
   let n = length path
-  let (rng, i_1) = idist.rand (0, n) rng
-  let (rng, i_2) = idist.rand (0, n) rng
+  let (rng, i_1) = idist.rand (0, n-1) rng
+  let (rng, i_2) = idist.rand (0, n-1) rng
   in (
     rng,
     (
@@ -58,5 +58,6 @@ def gen_step [n] rng (pop: [n][][2]f32) =
 def reduce_step (rng, pop) =
   (rng, pop)
 
-entry next_pop [n] rng (pop: [n][][2]f32) =
-  gen_step >-> reduce_step
+-- entry next_pop [n] rng (pop: [n][][2]f32) =
+--   gen_step >-> reduce_step
+entry next_pop rng pop = reduce_step (gen_step rng pop)

@@ -15,6 +15,9 @@ module type pop = {
   type~ population
   type state
 
+  -- val mutate: state -> solution -> (state, solution)
+  -- val crossover: state -> solution -> solution -> (state, solution)
+
   -- val generate_changes 'change : state -> individual -> (state, []change)
   -- val apply_change 'change : change -> individual -> individual
 
