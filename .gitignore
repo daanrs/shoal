@@ -11,6 +11,6 @@ dist-newstyle
 # data
 data
 
-lib/
+fut/lib
 
 __pycache__

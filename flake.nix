@@ -17,34 +17,30 @@
         pythonPackages = pkgs.python39Packages;
         poetry2nix = pkgs.poetry2nix;
 
-        rootDir = builtins.path { path = ./.; name = "nao"; };
-        haskellName = "hanao";
-        pythonName = "pynao";
-        futharkName = "futnao";
+        name = "shoal";
+        rootDir = builtins.path { path = ./.; name = name; };
 
-        pynaoProject = {
+        pyshoalProject = {
           projectDir = rootDir;
           overrides = pkgs.poetry2nix.overrides.withDefaults (
             self: super: { }
           );
         };
 
-        pynao = pkgs.poetry2nix.mkPoetryApplication pynaoProject;
-        pynaoEnv = (pkgs.poetry2nix.mkPoetryEnv pynaoProject).env.overrideAttrs (
+        pyshoal = pkgs.poetry2nix.mkPoetryApplication pyshoalProject;
+        pyshoalEnv = (pkgs.poetry2nix.mkPoetryEnv pyshoalProject).env.overrideAttrs (
           old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
               pythonPackages.ipython
-              # pythonPackages.poetry
-              pkgs.poetry
+              pythonPackages.poetry
             ];
           }
         );
 
-        hanao = returnShellEnv:
+        shoalhs = returnShellEnv:
           haskellPackages.developPackage {
-            inherit returnShellEnv;
+            inherit returnShellEnv name;
             root = rootDir;
-            name = haskellName;
             modifier = drv:
               pkgs.haskell.lib.addBuildTools drv
                 (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
@@ -55,15 +51,15 @@
                   pkgs.nixpkgs-fmt
                 ]);
           };
-        hanaoEnv = hanao true;
+        shoalhsEnv = shoalhs true;
       in
       {
-        packages.${haskellName} = hanao false;
+        packages.${name} = shoalhs false;
 
-        defaultPackage = self.packages.${system}.${haskellName};
+        defaultPackage = self.packages.${system}.${name};
 
         devShell = pkgs.mkShell {
-          inputsFrom = [ pynaoEnv hanaoEnv ];
+          inputsFrom = [ pyshoalEnv shoalhsEnv ];
         };
       }
     );
