@@ -1,18 +1,22 @@
-val score: final -> objective
-val best: solution -> final
+val score: final -> obj
+val best: sol -> final
 
-generate :: solution -> change
-apply :: solution -> change -> solution
+change_create :: sol -> change
+change_apply :: sol -> change -> [sol]
 
--- val change: solution -> solution
--- val combine: solution -> solution -> solution
+-- (obj, sol) :: monoid
+invalid :: (ojb, sol)
+max :: (obj, sol) -> (obj, sol) -> (obj, sol)
+
+-- val change: sol -> sol
+-- val combine: sol -> sol -> sol
 
 -- change :: monoid
 -- val mempty: change
 -- val op: change -> change -> change
 
--- val generate: state -> solution -> (state, change)
--- val apply: change -> solution -> solution
+-- val generate: state -> sol -> (state, change)
+-- val apply: change -> sol -> sol
 
 -- val gen_step: state -> set -> (state, a)
 -- val reduce_step: (state, a) -> (state, a) -> (state, set)
