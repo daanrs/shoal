@@ -8,6 +8,9 @@ library
     build-depends:
       , base
       , futhark
+      , massiv
+      , pipes
+      , random
 
     hs-source-dirs: hs
     exposed-modules: Hanao
