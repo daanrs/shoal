@@ -1,2 +1,2 @@
-main: fut/tsp.fut
-	futhark python --library fut/tsp.fut -o py/fut/tsp
+main: fut/ea.fut
+	futhark python --library fut/ea.fut -o py/fut/ea

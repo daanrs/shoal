@@ -1,36 +1,43 @@
+import "./lib/github.com/diku-dk/cpprandom/random"
 import "./tsp"
 
--- create 2 indices and values to swap
-def mk_swap rng path =
-  let n = length path
-  let (rng, i_1) = idist.rand (0, n-1) rng
-  let (rng, i_2) = idist.rand (0, n-1) rng
-  in (
-    rng,
-    (
-      [ i_1, i_2 ],
-      [ path[i_2], path[i_1] ]
-    )
-  )
+module tsp = traveling_salesman_problem minstd_rand f32
+open tsp
 
-def apply_swap (indices, values) path =
-  scatter (copy path) indices values
+-- return a solution with k values cycled
+def swap [n] (k: i64) (path: [n]vec) (rng: rng_engine) =
+  let rngs = minstd_rand.split_rng k rng
+  let (rngs, is) = unzip (map (idist.rand (0, n-1)) rngs)
+  let vals = rotate 1 (map (\x -> path[x]) is)
+  in (minstd_rand.join_rng rngs, scatter (copy path) is vals)
 
-def gen_step [n] rng (sols: [n]solution) =
-  let rngs = minstd_rand.split_rng n rng
-  let (rngs, swaps) = unzip (map2 mk_swap rngs sols)
-  let sols = map2 apply_swap swaps sols
+def gen_step [m] [n] rng (sols: [m]solution [n]) =
+  let rngs = minstd_rand.split_rng m rng
+  let (rngs, sols) = unzip (map2 (state_map (swap 2)) sols rngs)
   let rng = minstd_rand.join_rng rngs
   in (rng, sols)
 
-def invalid: (f32, solution) = (f32.lowest, #nothing)
+def reduce_step sols sols_next =
+  let sols = zip (map objective sols) sols
+  let sols_next = zip (map objective sols_next) sols_next
+  let (_, sols) = unzip (map2 max sols sols_next)
+  in sols
 
-def max (obj0, sol0) (obj1, sol1) =
-  if gt obj0 obj1 then
-    (obj0, sol0)
-  else
-    (obj1, sol1)
+entry start n = mk_problem n (minstd_rand.rng_from_seed [123])
 
-def reduce_step sol0 sol1 =
-  let sol0 = zip (map objective sol0) sol0
-  let sol1 = zip (map objective sol1) sol1
+entry solutions = initial_solutions
+
+entry step rng sols =
+  let (rng, sols_next) = gen_step rng sols
+  in (rng, reduce_step sols sols_next)
+
+entry map_obj = map objective
+
+def print_vector {x, y} = [x, y]
+
+def print [n] (sol: solution [n]) =
+  match sol
+  case #nothing -> replicate n [0, 0]
+  case #just sol -> map print_vector sol
+
+entry print_solutions = map print
