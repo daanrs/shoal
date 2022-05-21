@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               hanao
+name:               shoal
 version:            0.1.0.0
 author:             daanrs
 maintainer:         daan@spijke.rs
@@ -13,5 +13,5 @@ library
       , random
 
     hs-source-dirs: hs
-    exposed-modules: Hanao
+    exposed-modules: Shoal
     default-language: Haskell2010
