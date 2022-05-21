@@ -1,3 +1,4 @@
-# Shoal: gpu accelerated swarm intelligence & other metaheuristics
-Experimental library using haskell and futhark for natural optimization
-using GPU acceleration. Heavy WIP!
+# Shoal
+Gpu accelerated swarm intelligence & other metaheuristics
+
+Using it to learn futhark. WIP.
